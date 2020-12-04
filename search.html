@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>livesearch</title>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+	<script>
+			
+			//check the document is loaded fully
+$(document).ready(function(){
+    var searchString; //this variable will hold the string the user types in
+    var dataString;   //this variable is the data sent with the AJAX post request 
+
+    //retrieve all the records by sending an AJAX GET request to the backend script and appending all the output into the records_table using a loop
+    $.ajax({
+        url: "users.php", 
+        success: function(data){
+            $("#records_table tr:gt(0)").remove();
+            $.each(data, function(i, item) {
+                $("#records_table").append("<tr><td>"+item.firstname+"</td><td>"+item.lastname+"</td></tr>")    
+            }); 
+        },
+        dataType:"json"
+    });
+        
+    //detect keyup event and trigger AJAX POST request to the backend script, clear the records_table and output only the search results
+    $("#search").keyup(function(){
+        searchString = $("#search").val();
+        dataString = 'search='+searchString;
+            $.ajax({
+            url: "users.php",
+            type: "POST",
+            data: dataString,
+            success: function(data){
+                $("#records_table tr:gt(0)").remove(); //this line clears records_table but crucially leaves behind the leading row
+                $.each(data, function(i, item) {
+                    $("#records_table").append("<tr><td>"+item.firstname+"</td><td>"+item.lastname+"</td></tr>")    
+                });
+            },
+            dataType:"json"
+        }); 
+    })
+});
+
+
+
+	</script>
+</head>
+<body>
+	<h1>Users:</h1>
+<label for="search">Search:</label>
+<input name="search" id="search" type="text"/>
+<br/>
+<table id="users_table">
+      <tr><th>Firstname</th><th>Surname</th><th>Email</th></tr>
+</table>   
+
+</body>
+</html>
